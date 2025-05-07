@@ -34,5 +34,5 @@ GitHub Repository used for the development of the ISLP webpage
 # - Security
 # - Reliability
 # - Performance Efficiency 
-# - Cost Optimization 
-# - Sustainability
+# - Cost Optimization (Pay-per use, resource optizimization as there is auto scaling groups and right sizing groups which helps with efficiently using the resources and not over-provisiong on a resource or just use more resources than needed)
+# - Sustainability (you do not need to pruchase more or upgrade on software as cloud services are always to the latest software since the cloud prrovider is the one managing the software and does not need extra purchases depending on what you are using. Also less space is being used in the company as there is lesser need for on-premise servers and cooling. lesser maintanence. saves on energy.)
