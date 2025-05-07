@@ -29,3 +29,10 @@ GitHub Repository used for the development of the ISLP webpage
 # - Accessible from anywhere at anytime
 # - Quick and effecient upload and retrieval of information
 # - Since we will most likely be operating a pay-as-you-go basis, in this case, would be more cost-efficient as opposed to traditional methods of data store
+# [AWS Well-Architectured Framework]
+# - Operational excellence 
+# - Security
+# - Reliability
+# - Performance Efficiency 
+# - Cost Optimization 
+# - Sustainability
