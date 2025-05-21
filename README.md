@@ -33,9 +33,13 @@ GitHub Repository used for the development of the ISLP webpage
 
 # [AWS Well-Architectured Framework]
 # - Operational excellence 
-# - Security
-# - Reliability
+--Perform load testing and simulate failures/heavy load in case of rainy days. Implementation of monitoring and alerts in case of system failure
+# - Security 
+--Implement IAM roles, least privilege. Access logging to monitor who enters the app. Enable encryption to prevent public from entering and accessing important information
+# - Reliability 
+--Implement failover mechanisms, auto scaling and monitor quotas
 # - Performance Efficiency 
+--Resources that are being used can be auto scaled to meet the current demand, so if more it will increase resource usage and if lesser, it will reduce it.
 # - Cost Optimization 
 --Pay-per use, resource optizimization as there is auto scaling groups and right sizing groups which helps with efficiently using the resources and not over-provisiong on a resource or just use more resources than needed
 # - Sustainability 
