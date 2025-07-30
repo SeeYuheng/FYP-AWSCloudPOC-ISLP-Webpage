@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create New Project</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: white;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .main-content {
+      max-width: 700px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="file"],
+    select,
+    textarea {
+      background-color: #d9d9d9;
+      border: none;
+      border-radius: 10px;
+      height: 40px;
+      padding: 10px;
+    }
+
+    textarea {
+      height: 150px;
+      resize: none;
+    }
+
+    .form-control:focus {
+      background-color: #d9d9d9;
+      box-shadow: none;
+    }
+
+    .btn-custom {
+      background-color: #d9d9d9;
+      border: none;
+      padding: 8px 20px;
+      font-weight: bold;
+      border-radius: 10px;
+      text-decoration: none;
+      color: black;
+    }
+
+    .btn-custom:hover {
+      background-color: #bfbfbf;
+    }
+
+    .add-member {
+      display: flex;
+      gap: 10px;
+    }
+
+    .date-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .date-group > div {
+      flex: 1;
+    }
+
+    .member-dropdown {
+      background-color: #d9d9d9;
+      border: none;
+      border-radius: 10px;
+      height: 40px;
+      padding: 10px;
+      width: 100%;
+    }
+
+    .member-dropdown:focus {
+      background-color: #d9d9d9;
+      box-shadow: none;
+    }
+
+    .added-members {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 10px;
+      min-height: 100px;
+    }
+
+    .member-tag {
+      display: inline-block;
+      background-color: black;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      margin: 2px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .member-tag .remove {
+      margin-left: 5px;
+      font-weight: bold;
+    }
+
+    .member-tag:hover {
+      background-color: #333;
+    }
+
+    .no-members {
+      color: #6c757d;
+      font-style: italic;
+    }
+
+    .info-box {
+      background-color: #d9d9d9;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      color: #333;
+      font-weight: bold;
+    }
+
+    /* Username badge styles */
+    .lecturer-badge,
+    .student-badge,
+    .admin-badge {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      border-radius: 15px;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 1000;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .lecturer-badge {
+      background-color: black;
+      color: white;
+    }
+
+    .student-badge {
+      background-color: blue;
+      color: white;
+    }
+
+    .admin-badge {
+      background-color: red;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="main-content">
+    <!-- Top Bar with Back and Create buttons -->
+    <div class="top-bar">
+      <% if (currentUser && currentUser.roleid === 1) { %>
+        <a href="/admin" class="btn btn-custom">Back</a>
+      <% } else { %>
+        <a href="/lecturer" class="btn btn-custom">Back</a>
+      <% } %>
+      <button form="project-form" type="submit" class="btn btn-custom">Create</button>
+    </div>
+
+    <div class="dashboard-title">Create New Project</div>
+
+    <!-- Project Form -->
+    <form id="project-form" action="/addISLP" method="POST" enctype="multipart/form-data">
+      <div class="mb-4">
+        <label for="project_title" class="form-label">Project Name:</label>
+        <input type="text" class="form-control" id="project_title" name="project_title" required>
+      </div>
+
+      <!-- Note: You will automatically be assigned as the project head -->
+      <div class="mb-4">
+        <div class="info-box">
+          <strong>Note:</strong> You will be assigned as the project head for this project.
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label for="members" class="form-label">Add Members (Students only):</label>
+        <div class="add-member">
+          <select class="member-dropdown" id="userDropdown">
+            <option value="">Select a student to add...</option>
+            <% if (students && students.length > 0) { %>
+              <% students.forEach(function(student) { %>
+                <option value="<%= student.accountid %>" data-username="<%= student.username %>" data-email="<%= student.email %>" data-role="<%= student.roleid %>">
+                  <%= student.username %> (<%= student.email %>)
+                </option>
+              <% }); %>
+            <% } %>
+          </select>
+          <button type="button" class="btn btn-custom" onclick="addMember()">Add</button>
+        </div>
+        <div class="added-members" id="membersContainer">
+          <div class="no-members" id="noMembersText">No members added yet.</div>
+        </div>
+        <input type="hidden" id="selectedMembers" name="members" value="">
+      </div>
+
+      <div class="mb-4">
+        <label for="description" class="form-label">Add Description:</label>
+        <textarea class="form-control" id="description" name="description" required></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label for="project_images" class="form-label">Project Image (Required):</label>
+        <input type="file" class="form-control" id="project_images" name="project_images" accept="image/*" required>
+        <small class="text-muted">Supported formats: JPG, PNG, GIF (Max 5MB)</small>
+      </div>
+
+      <% if (currentUser && currentUser.roleid === 1) { %>
+        <div class="mb-4">
+          <label for="status" class="form-label">Project Status:</label>
+          <select class="form-control" id="status" name="status_statusid" required>
+            <% if (statusOptions && statusOptions.length > 0) { %>
+              <% statusOptions.forEach(function(status) { %>
+                <option value="<%= status.statusid %>"><%= status.name %></option>
+              <% }); %>
+            <% } %>
+          </select>
+        </div>
+      <% } else { %>
+        <!-- Lecturers get default status (Pending = statusid 1) -->
+        <input type="hidden" name="status_statusid" value="1">
+      <% } %>
+
+      <div class="mb-4 date-group">
+        <div>
+          <label for="project_start" class="form-label">Start Date:</label>
+          <input type="date" class="form-control" id="project_start" name="project_start" required>
+        </div>
+        <div>
+          <label for="project_end" class="form-label">End Date:</label>
+          <input type="date" class="form-control" id="project_end" name="project_end" required>
+        </div>
+      </div>
+      
+    </form>
+  </div>
+
+  <script>
+    let selectedMembers = [];
+
+    // Member management functions
+    function addMember() {
+      const dropdown = document.getElementById('userDropdown');
+      const userId = dropdown.value;
+      const userOption = dropdown.options[dropdown.selectedIndex];
+      
+      if (userId && !selectedMembers.some(member => member.id === userId)) {
+        const member = {
+          id: userId,
+          username: userOption.dataset.username,
+          email: userOption.dataset.email,
+          role: userOption.dataset.role
+        };
+        
+        selectedMembers.push(member);
+        updateMembersDisplay();
+        updateMembersHiddenInput();
+        dropdown.value = '';
+      }
+    }
+
+    function removeMember(memberId) {
+      const index = selectedMembers.findIndex(member => member.id === memberId);
+      if (index > -1) {
+        selectedMembers.splice(index, 1);
+        updateMembersDisplay();
+        updateMembersHiddenInput();
+      }
+    }
+
+    function updateMembersDisplay() {
+      const container = document.getElementById('membersContainer');
+      if (selectedMembers.length === 0) {
+        container.innerHTML = '<div class="no-members">No members added yet.</div>';
+      } else {
+        container.innerHTML = selectedMembers.map(member => 
+          `<div class="member-tag" onclick="removeMember('${member.id}')">
+            ${member.username} (${member.email}) <span class="remove">×</span>
+          </div>`
+        ).join('');
+      }
+    }
+
+    function updateMembersHiddenInput() {
+      document.getElementById('selectedMembers').value = JSON.stringify(selectedMembers);
+    }
+
+    // Date validation and form submission
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date().toISOString().split('T')[0];
+      const startDateInput = document.getElementById('project_start');
+      const endDateInput = document.getElementById('project_end');
+      const form = document.getElementById('project-form');
+      
+      // Set minimum date to today
+      startDateInput.setAttribute('min', today);
+      endDateInput.setAttribute('min', today);
+      
+      // Add event listeners for date validation
+      startDateInput.addEventListener('change', function() {
+        const startDate = this.value;
+        if (startDate) {
+          endDateInput.setAttribute('min', startDate);
+          // If end date is before start date, clear it
+          if (endDateInput.value && endDateInput.value < startDate) {
+            endDateInput.value = '';
+            alert('End date cannot be before start date. Please select a valid end date.');
+          }
+        }
+      });
+      
+      endDateInput.addEventListener('change', function() {
+        const endDate = this.value;
+        const startDate = startDateInput.value;
+        
+        if (startDate && endDate && endDate < startDate) {
+          this.value = '';
+          alert('End date cannot be before start date. Please select a valid end date.');
+        }
+      });
+
+      // Form submission validation
+      form.addEventListener('submit', function(e) {
+        const imageInput = document.getElementById('project_images');
+        
+        // Check if image is selected
+        if (!imageInput.files || imageInput.files.length === 0) {
+          e.preventDefault();
+          alert('Please select a project image. Project image is required.');
+          return false;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        const selectedFile = imageInput.files[0];
+        
+        if (!allowedTypes.includes(selectedFile.type)) {
+          e.preventDefault();
+          alert('Please select a valid image file (JPG, PNG, or GIF).');
+          return false;
+        }
+        
+        // Validate file size (5MB = 5 * 1024 * 1024 bytes)
+        const maxSize = 5 * 1024 * 1024;
+        if (selectedFile.size > maxSize) {
+          e.preventDefault();
+          alert('File size must be less than 5MB. Please select a smaller image.');
+          return false;
+        }
+      });
+    });
+  </script>
+
+  <!-- Username badge -->
+  <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+    <div class="<%= currentUser.roleid === 1 ? 'admin-badge' : currentUser.roleid === 2 ? 'lecturer-badge' : 'student-badge' %>">
+      <%= currentUser.username %>
+    </div>
+  <% } %>
+
+</body>
+</html>
+
+<!--Tan Ye Kai 23024918-->

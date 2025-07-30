@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <title>Thank you!</title>
+    <style>
+        /* Username badge styles */
+        .lecturer-badge,
+        .student-badge,
+        .admin-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .admin-badge {
+            background-color: red;
+        }
+
+        .lecturer-badge {
+            background-color: black;
+        }
+
+        .student-badge {
+            background-color: blue;
+        }
+    </style>
+</head>
+<body>
+    <!-- Activity 4: Insert code here to include the header (found in the partials folder) to your page -->
+
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Airplane Ticket App</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/addTicket">Add New Ticket</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/contact">Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/feedback">Feedback</a>
+                    </li>
+                </ul>
+                <form class="d-flex" action="/search" method="GET">
+                    <input class="form-control me-2" type="search" placeholder="Search Tickets" aria-label="Search" name="query">
+                    <button class="btn btn-outline-light" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    
+    <ul><h2>Thank you for your comment!</h2></ul>
+    <ul>Name: <%= name %></ul>
+    <ul>Email: <%= email %></ul>
+    <!-- Activity 3: Edit submitted.ejs to display the information entered by user in the contact page -->
+    <ul>Contact No.: <%= contact_no %></ul>
+    <ul>Comment: <%= comments %></ul>
+
+    <!-- Username badge -->
+    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+        <div class="<%= currentUser.roleid === 1 ? 'admin-badge' : currentUser.roleid === 2 ? 'lecturer-badge' : 'student-badge' %>">
+            <%= currentUser.username || currentUser.firstName %>
+        </div>
+    <% } %>
+
+</body>
+</html>
+
+<!-- Tan Ye Kai 23024918 -->

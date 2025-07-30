@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      background-color: white;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .back-link {
+      color: black;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+      color: black;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-custom {
+      background-color: #d9d9d9;
+      border: none;
+      padding: 10px 20px;
+      font-weight: bold;
+      border-radius: 10px;
+      text-decoration: none;
+      color: black;
+      font-size: 0.9rem;
+    }
+
+    .btn-custom:hover {
+      background-color: #bfbfbf;
+      color: black;
+    }
+
+    .project-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 30px;
+      background-color: #d9d9d9;
+      border-radius: 20px;
+      padding: 40px 20px;
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .title-image-container {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: auto;
+      max-width: 60%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .title-image-fade {
+      height: 100%;
+      width: auto;
+      max-width: none;
+      object-fit: cover;
+      object-position: right center;
+      opacity: 0.25;
+      border-radius: 0 20px 20px 0;
+      transition: opacity 0.3s ease;
+      float: right;
+      mask: linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+      -webkit-mask: linear-gradient(to left, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+    }
+
+    .title-content {
+      position: relative;
+      z-index: 2;
+      padding-right: 5%;
+    }
+
+    .project-title:hover .title-image-fade {
+      opacity: 0.35;
+    }
+
+    .content-box {
+      background-color: #d9d9d9;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      min-height: 100px;
+    }
+
+    .content-box h5 {
+      font-weight: bold;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+    }
+
+    .content-box p {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .posts-section {
+      position: relative;
+    }
+
+    .posts-buttons {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .posts-content {
+      margin-top: 50px;
+      min-height: 150px;
+    }
+
+    .post-item {
+      background-color: #d9d9d9 !important;
+      border: none;
+    }
+
+    .lecturer-badge, .student-badge, .admin-badge {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      z-index: 1000;
+    }
+    
+    .admin-badge {
+      background-color: red;
+    }
+    
+    .lecturer-badge {
+      background-color: black;
+    }
+    
+    .student-badge {
+      background-color: blue;
+    }
+
+    .like-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .like-button:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .like-button.liked {
+      color: #ff6b6b;
+    }
+
+    .like-button.not-liked {
+      color: #666;
+    }
+
+    .like-count {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .post-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container-fluid">
+    <!-- Header -->
+    <div class="header">
+      <% if (user && user.roleid === 3) { %>
+        <a href="/student" class="back-link">< All Projects</a>
+      <% } else if (user && user.roleid === 1) { %>
+        <a href="/admin" class="back-link">< All Projects</a>
+      <% } else { %>
+        <a href="/lecturer" class="back-link">< All Projects</a>
+      <% } %>
+      <div class="header-buttons">
+        <% 
+          // All authenticated users can add posts to any project
+          let canAddPost = user ? true : false;
+        %>
+        <% if (canAddPost) { %>
+          <a href="/addPost/<%= project.projectid %>" class="btn-custom">Add Post</a>
+        <% } %>
+        <% if (user && user.roleid === 3) { %>
+          <a href="/signup/<%= project.projectid %>" class="btn-custom">Sign up</a>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Project Title -->
+    <div class="project-title">
+      <!-- Background Image (faded) -->
+      <% if (project && project.project_images) { %>
+        <div class="title-image-container">
+          <img src="/images/<%= project.project_images %>" 
+               alt="<%= project.project_title %>" 
+               class="title-image-fade">
+        </div>
+      <% } %>
+      
+      <!-- Title Content -->
+      <div class="title-content">
+        <% if (project) { %>
+          <%= project.project_title || 'Project Name' %>
+        <% } else { %>
+          Project Name
+        <% } %>
+      </div>
+    </div>
+    
+    <!-- Project Content -->
+    <% if (project) { %>
+      <!-- Facilitator Section -->
+      <div class="content-box">
+        <h5>Facilitator:</h5>
+        
+        <% if (facilitators && facilitators.length > 0) { %>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+            <% facilitators.forEach(function(facilitator) { %>
+              <div style="background-color: black; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem;">
+                <%= facilitator.username %> (<%= facilitator.email %>)
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p>No facilitator assigned to this project.</p>
+        <% } %>
+      </div>
+
+      <!-- Description Section -->
+      <div class="content-box">
+        <h5>Description:</h5>
+        <p><%= project.description || 'No description available' %></p>
+      </div>
+
+      <!-- Project Details Section -->
+      <div class="content-box">
+        <h5>Project Details:</h5>
+        <p><strong>Start Date:</strong> 
+          <% 
+            if (project.project_start) {
+              var startDate = new Date(project.project_start);
+              var formattedStartDate = (startDate.getDate() + '').padStart(2, '0') + '/' + 
+                            ((startDate.getMonth() + 1) + '').padStart(2, '0') + '/' +                         
+                              startDate.getFullYear();
+          %>
+            <%= formattedStartDate %>
+          <% } else { %>
+            Not specified
+          <% } %>
+        </p>
+        <p><strong>End Date:</strong> 
+          <% 
+            if (project.project_end) {
+              var endDate = new Date(project.project_end);
+              var formattedEndDate = (endDate.getDate() + '').padStart(2, '0') + '/' + 
+                                        ((endDate.getMonth() + 1) + '').padStart(2, '0') + '/' +                         
+                                        endDate.getFullYear();
+          %>
+            <%= formattedEndDate %>
+          <% } else { %>
+            Not specified
+          <% } %>
+        </p>
+        <% if (project.project_status) { %>
+          <p><strong>Status:</strong> <%= project.project_status %></p>
+        <% } %>
+      </div>
+
+      <!-- Members Section -->
+      <div class="content-box">
+        <h5>Project Members:</h5>
+        <% if (members && members.length > 0) { %>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+            <% members.forEach(function(member) { %>
+              <div style="background-color: black; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9rem;">
+                <%= member.username %> (<%= member.email %>)
+              </div>
+            <% }); %>
+          </div>
+        <% } else { %>
+          <p>No members assigned to this project.</p>
+        <% } %>
+      </div>
+
+      <!-- Posts Section -->
+      <div class="content-box posts-section">
+        <h5>Posts:</h5>
+        <div class="posts-content">
+          <% if (posts && posts.length > 0) { %>
+            <% posts.forEach(post => { %>
+              <div class="mb-3 p-3 rounded shadow-sm post-item">
+                <p><%= post.description %></p>
+                
+                <!-- Display post image if available -->
+                <% if (post.post_image) { %>
+                  <div class="post-image-container mt-2 mb-2">
+                    <img src="/images/<%= post.post_image %>" 
+                         alt="Post image" 
+                         class="img-fluid rounded" 
+                         style="max-width: 100%; max-height: 400px; object-fit: contain;">
+                  </div>
+                <% } %>
+                
+                <small class="text-muted">By <%= post.username %> on <%= new Date(post.submission_date).toLocaleString() %></small>
+                
+                <!-- Post Actions (Likes and Edit/Delete buttons) -->
+                <div class="post-actions">
+                  <!-- Like Button (available to all authenticated users) -->
+                  <% if (user) { %>
+                    <button class="like-button <%= post.user_liked > 0 ? 'liked' : 'not-liked' %>" 
+                            data-post-id="<%= post.submissionsid %>">
+                      <span class="like-icon">👍</span>
+                      <span class="like-count" id="like-count-<%= post.submissionsid %>"><%= post.like_count || 0 %></span>
+                    </button>
+                  <% } else { %>
+                    <span class="text-muted">
+                      <span>👍</span>
+                      <span class="like-count"><%= post.like_count || 0 %></span>
+                    </span>
+                  <% } %>
+
+                  <!-- Edit/Delete Buttons -->
+                  <div class="action-buttons">
+                    <% if (user && user.roleid === 1) { %>
+                      <!-- Admin can edit and delete any post -->
+                      <% if (user.accountid === post.accountid) { %>
+                        <!-- Admin can edit their own posts -->
+                        <a href="/editPost/<%= post.submissionsid %>" class="btn btn-sm btn-outline-dark me-2">Edit</a>
+                      <% } %>
+                      <!-- Admin can always delete any post -->
+                      <a href="/deletePost/<%= post.submissionsid %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
+                    <% } else if (user && user.roleid === 2) { %>
+                      <% if (user.accountid === post.accountid) { %>
+                        <!-- Lecturer can edit and delete their own posts -->
+                        <a href="/editPost/<%= post.submissionsid %>" class="btn btn-sm btn-outline-dark me-2">Edit</a>
+                        <a href="/deletePost/<%= post.submissionsid %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
+                      <% } else if (post.author_roleid === 3) { %>
+                        <!-- Lecturer can delete student posts only -->
+                        <a href="/deletePost/<%= post.submissionsid %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
+                      <% } %>
+                      <!-- Lecturers cannot edit/delete other lecturer posts - no buttons shown -->
+                    <% } else if (user && user.roleid === 3) { %>
+                      <% if (user.accountid === post.accountid) { %>
+                        <!-- Student can edit and delete their own posts only -->
+                        <a href="/editPost/<%= post.submissionsid %>" class="btn btn-sm btn-outline-dark me-2">Edit</a>
+                        <a href="/deletePost/<%= post.submissionsid %>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</a>
+                      <% } %>
+                      <!-- Students cannot edit/delete other people's posts - no buttons shown -->
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p>No posts available yet.</p>
+          <% } %>
+        </div>
+      </div>
+
+    <% } else { %>
+      <div class="content-box">
+        <p class="text-center">No project found.</p>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Username Badge -->
+  <% if (user && user.roleid === 1) { %>
+    <div class="admin-badge">
+      <% if (user && user.username) { %>
+        <%= user.username %>
+      <% } else { %>
+        Admin
+      <% } %>
+    </div>
+  <% } else if (user && user.roleid === 2) { %>
+    <div class="lecturer-badge">
+      <% if (user && user.username) { %>
+        <%= user.username %>
+      <% } else { %>
+        Lecturer
+      <% } %>
+    </div>
+  <% } else if (user && user.roleid === 3) { %>
+    <div class="student-badge">
+      <% if (user && user.username) { %>
+        <%= user.username %>
+      <% } else { %>
+        Student
+      <% } %>
+    </div>
+  <% } %>
+
+  <script>
+    // Handle like button clicks
+    document.addEventListener('DOMContentLoaded', function() {
+      const likeButtons = document.querySelectorAll('.like-button');
+      
+      likeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const postId = this.getAttribute('data-post-id');
+          toggleLike(postId);
+        });
+      });
+    });
+
+    function toggleLike(postId) {
+      fetch(`/api/like/${postId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          console.error('Error:', data.error);
+          return;
+        }
+
+        // Update the like count
+        const likeCountElement = document.getElementById(`like-count-${postId}`);
+        if (likeCountElement) {
+          likeCountElement.textContent = data.like_count;
+        }
+
+        // Update the button appearance
+        const likeButton = document.querySelector(`[data-post-id="${postId}"]`);
+        if (likeButton) {
+          if (data.liked) {
+            likeButton.classList.remove('not-liked');
+            likeButton.classList.add('liked');
+          } else {
+            likeButton.classList.remove('liked');
+            likeButton.classList.add('not-liked');
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  </script>
+
+</body>
+</html>
+
